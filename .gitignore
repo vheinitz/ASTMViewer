@@ -1,0 +1,17 @@
+# Build
+bin/
+obj/
+*.user
+*.suo
+*.cache
+[Bb]uild/
+[Oo]bj/
+
+# IDE
+.idea/
+.vscode/
+*.userprefs
+
+# OS
+.DS_Store
+Thumbs.db
