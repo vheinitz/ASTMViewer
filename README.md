@@ -2,50 +2,53 @@
 
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
 
-Test program in C# for parsing **ASTM E1394** messages and creating object-trees.
+Small C# WinForms test program that parses ASTM E1394 (LIS2-A2) record text
+and shows the records as a tree.
 
-ASTM E1394 (also known as LIS2-A2) is the standard communication protocol used
-between laboratory instruments and laboratory information systems (LIS) for
-exchanging test orders and results.
+Status: older project (2014), not maintained. Written as a first exercise in
+C#; error handling is mostly `TODO`.
 
-## Features
+![Screenshot](doc/Screenshot.png)
 
-- Parses ASTM 1394 message frames (header `H`, patient `P`, order `O`, result `R`,
-  comment `C`, manufacturer `M`, terminator `L`).
-- Builds an in-memory object tree representing the parsed records.
-- Provides a WinForms GUI (`ASTMParserGUI`) to load and inspect messages.
-- Includes a commented, line-by-line parser class suitable as a reference
-  implementation for ASTM parsing in .NET.
+## What it does
 
-## Project structure
+Paste ASTM record text into the text box on the right and press *Parse*. The text is
+split into records by line breaks and into fields by `|`. Components (`^`),
+repeats (`\`) and escape sequences are not split; E1381 framing (STX/ETX,
+checksums) is not handled, so the input must be plain record lines.
+
+Recognised record types and the tree they build:
+
+- `H` starts a message, `L` ends it
+- `P` patient, `O` order (under the last patient), `R` result (under the last order)
+- `Q` request
+- `C` comment and `M` manufacturer record, attached to the preceding record
+
+Other record types are ignored. A class for `S` (scientific) records exists,
+but the parser does not create it.
+
+## Files
 
 ```
-ASTMParser.cs            Core parser (ASTM_Record, ASTM_Comment, ...)
-ASTMParserGUI.cs         WinForms viewer
-ASTMParser.sc.cs         Additional parser/render helpers
-ASTMViewer.sln / .csproj Visual Studio solution
-doc/                     Documentation
+ASTMParser.cs            parser and record classes (namespace ASTMParser)
+ASTMParserGUI.cs         form: text box, Parse button, tree view
+Form1.Designer.cs        designer code for ASTMParserGUI
+Program.cs               entry point
+ASTMParser.sc.cs         earlier version of the parser inside a form; not part of the build
+exe/                     prebuilt WindowsFormsApplication2.exe
 ```
 
-## Requirements
+## Build
 
-- .NET Framework (Visual Studio-compatible; the project targets classic
-  WinForms/.NET Framework).
-
-## Build & run
-
-Open `ASTMViewer.sln` in Visual Studio and build, or use `msbuild`:
+Visual Studio project targeting .NET Framework 4.0 Client Profile. Open
+`ASTMViewer.sln` in Visual Studio, or:
 
 ```bash
-msbuild ASTMViewer.sln /p:Configuration=Release
+msbuild ASTMViewer.sln /p:Configuration=Release /p:Platform=x86
 ```
 
-## Usage
-
-Load an ASTM message file or paste a raw ASTM frame into the viewer. The parser
-splits the frame into records (`|` delimiter) and fields (`\` delimiter),
-creating an object tree that can be inspected field by field.
+The output is `WindowsFormsApplication2.exe`.
 
 ## License
 
-[MIT](LICENSE) © Valentin Heinitz
+[MIT](LICENSE), (c) 2014 Valentin Heinitz
